@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University Chatbot</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    />
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img
+                src="{{ url_for('static', filename='ESPE.png') }}"
+                alt="Escudo de la ESPE"
+            />
+        </div>
+        <div class="chat-container">
+            <h1>Bienvenido al Chatbot Universitario</h1>
+            <div class="chat-box" id="chat-box"></div>
+            <div class="input-container">
+                <input type="text" id="query" placeholder="Haz una pregunta..." aria-label="Ingrese su pregunta" />
+                <button onclick="askQuestion()">Preguntar</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Universidad GRUPO PROYECTO. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        async function askQuestion() {
+            const query = document.getElementById("query").value;
+            if (query.trim() === "") return;
+
+            addMessage("Tú: " + query, "user-message");
+
+            const response = await fetch("/chatbot", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ query: query }),
+            });
+            const data = await response.json();
+
+            addMessage(data.answer, "bot-message");
+            document.getElementById("query").value = "";
+        }
+
+        function addMessage(message, className) {
+            const chatBox = document.getElementById("chat-box");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = className;
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
